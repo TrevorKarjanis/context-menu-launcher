@@ -1,0 +1,13 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CLASSES_ROOT\*\shell\CompareItFiles]
+@="Compare it!"
+
+[HKEY_CLASSES_ROOT\*\shell\CompareItFiles\command]
+@="\"C:\\singleinstance.exe\" \"%1\" \"C:\\Program Files (x86)\\Compare It!\\wincmp3.exe\" $files --si-timeout 5000 --si-maxfilecount 2 --si-minfilecount 2"
+
+[HKEY_CLASSES_ROOT\Folder\shell\CompareItFolders]
+@="Compare It!"
+
+[HKEY_CLASSES_ROOT\Folder\shell\CompareItFolders\command]
+@="\"C:\\singleinstance.exe\" \"%1\" \"C:\\Program Files (x86)\\Compare It!\\wincmp3.exe\" $files --si-timeout 5000 --si-maxfilecount 2 --si-minfilecount 2"
