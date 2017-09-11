@@ -1,6 +1,6 @@
 This is a fork of zenden2k's [context-menu-launcher](https://github.com/zenden2k/context-menu-launcher) that adds support for minimum and maximum file counts.
-   A minimum file count can be used to prevent the launcher from executing the command if a minimal number of files have not been selected.
-   A maximum file count can be used to execute the command as soon as the maximum number of files have been selected. This is particularly helpful when selecting files individually (e.g. selecting files from separate Windows Explorer instances).
+* A minimum file count can be used to prevent the launcher from executing the command if a minimal number of files have not been selected.
+* A maximum file count can be used to execute the command as soon as the maximum number of files have been selected. This is particularly helpful when selecting files individually (e.g. selecting files from separate Windows Explorer instances).
 
 [Download executable](https://github.com/TrevorKarjanis/context-menu-launcher/releases/tag/2.0)
 
