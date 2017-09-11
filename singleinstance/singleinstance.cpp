@@ -1,5 +1,20 @@
-// singleinstance.cpp : Defines the entry point for the application.
-//
+/*
+   Copyright 2017 Trevor Karjanis
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+      http ://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+   singleinstance.cpp : Defines the entry point for the application.
+*/
 
 #include "stdafx.h"
 
@@ -47,6 +62,8 @@ public:
 };
 
 int timeout = 400; // ms
+int maxFileCount = 0;
+int minFileCount = 1;
 enum { TIMER_ID = 1 };
 LPTSTR *szArgList;
 int argCount;
@@ -63,9 +80,13 @@ LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow) {
     szArgList = CommandLineToArgvW(GetCommandLine(), &argCount);
     for (int i = 0; i < argCount; i++) {
-        if (!lstrcmp(szArgList[i], _T("--si-timeout")) && i + 1 < argCount ) {
+        if (!lstrcmp(szArgList[i], _T("--si-timeout")) && i + 1 < argCount) {
             timeout = std::stoi(szArgList[i + 1]);
-        }
+        } else if (!lstrcmp(szArgList[i], _T("--si-maxfilecount")) && i + 1 < argCount) {
+			maxFileCount = std::stoi(szArgList[i + 1]);
+		} else if (!lstrcmp(szArgList[i], _T("--si-minfilecount")) && i + 1 < argCount) {
+			minFileCount = std::stoi(szArgList[i + 1]);
+		}
     }
 
     if (singleInstance.IsAnotherInstanceRunning()) {
@@ -97,7 +118,9 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
         } else {
             MessageBox(0, L"Usage: singleinstance.exe \"%1\" <command> $files [arguments]\r\n\r\n"
                 L"Optional arguments for singleinstance (not passed to command):\r\n"
-                L"--si-timeout <time to wait in msecs>"
+                L"--si-timeout <time to wait in msecs>\r\n"
+				L"--si-maxfilecount <maximum file count>\r\n"
+				L"--si-minfilecount <minimum file count>"
                 , _T("singleinstance"), 0);
             return 0;
         }
@@ -202,8 +225,12 @@ void ArgvQuote(const std::wstring& Argument, std::wstring& CommandLine, bool For
 }
 
 void LaunchApp() {
+	if (files.size() < minFileCount) {
+		return;
+	}
+
     std::wstring cmdLine;
-   
+
     for (int i = 3; i < argCount; i++) {
         if (!lstrcmp(szArgList[i], _T("$files"))) {
             for (const auto& file : files) {
@@ -242,6 +269,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             LPCTSTR lpszString = reinterpret_cast<LPCTSTR>(pcds->lpData);
             files.push_back(lpszString);
         }
+
+		if (maxFileCount && files.size() >= maxFileCount) {
+			KillTimer(hWnd, TIMER_ID);
+			LaunchApp();
+			PostQuitMessage(0);
+		}
         break;
     case WM_TIMER:
         KillTimer(hWnd, TIMER_ID);
